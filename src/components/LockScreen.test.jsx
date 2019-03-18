@@ -6,25 +6,39 @@ import SlideToUnlock from "./SlideToUnlock";
 import TopOverlay from "./TopOverlay";
 
 describe("LockScreen", () => {
+  //BEGIN SETUP
+  //create let bindings to make these available
+  //to everything inside describe
   let props;
   let mountedLockScreen;
+
+  //create lockscreen fn available anywhere inside describe
   const lockScreen = () => {
     if (!mountedLockScreen) {
-      mountedLockScreen = mount(
-        <LockScreen {...props} />
-      );
+      //either mount lockscreen with current props,
+      //or return the already mounted one
+      mountedLockScreen = mount(<LockScreen {...props} />);
     }
+    //returns enzyme reactwrapper
+    //to be used in every test
     return mountedLockScreen;
-  }
+  };
 
+  //resets props and mountedlockscreen before every test
+  // to prevent state leakage between tests
   beforeEach(() => {
     props = {
       wallpaperPath: undefined,
       userInfoMessage: undefined,
-      onUnlocked: undefined,
+      onUnlocked: undefined
     };
+    //setting mLS to undefined mounts a new
+    //lockscreen with current props
     mountedLockScreen = undefined;
   });
+  //this setup keeps tests DRY by building up props incrementally,
+  // before mounting
+  //FINISH SETUP
 
   it("always renders a div", () => {
     const divs = lockScreen().find("div");
@@ -47,6 +61,7 @@ describe("LockScreen", () => {
     });
   });
 
+  //"ALWAYS" true tests
   it("always renders a `ClockDisplay`", () => {
     expect(lockScreen().find(ClockDisplay).length).toBe(1);
   });
@@ -61,6 +76,11 @@ describe("LockScreen", () => {
   it("always renders a `SlideToUnlock`", () => {
     expect(lockScreen().find(SlideToUnlock).length).toBe(1);
   });
+
+  //"CONDITIONALLY" true tests
+  //when testing conditionals, describe('the condition')
+  //then use beforeEach() to set up condition within describe
+  //it('does the action correctly based on the condition')
 
   describe("when `onUnlocked` is defined", () => {
     beforeEach(() => {
@@ -90,8 +110,12 @@ describe("LockScreen", () => {
     });
 
     it("applies that wallpaper as a background-image on the wrapping div", () => {
-      const wrappingDiv = lockScreen().find("div").first();
-      expect(wrappingDiv.props().style.backgroundImage).toBe(`url(${props.wallpaperPath})`);
+      const wrappingDiv = lockScreen()
+        .find("div")
+        .first();
+      expect(wrappingDiv.props().style.backgroundImage).toBe(
+        `url(${props.wallpaperPath})`
+      );
     });
   });
 
